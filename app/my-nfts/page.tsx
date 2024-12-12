@@ -1,12 +1,12 @@
 import NavBar from "@/components/NavBar";
-import MarketView from "@/components/MarketView";
+import MyNFTs from "@/components/MyNFTs";
 
-export default function Home() {
+export default function MyNFTsPage() {
   return (
     <main className="min-h-screen bg-gray-100">
       <NavBar />
       <div className="container mx-auto px-4 py-8">
-        <MarketView />
+        <MyNFTs />
       </div>
     </main>
   );
