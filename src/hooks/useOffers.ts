@@ -1,3 +1,4 @@
+// src\hooks\useOffers.ts
 import { useState, useEffect } from "react"
 import { NFTWithDetails } from "../types"
 import { fetchNFTDetails, fetchNFTOffers, client } from "../utils/aptosUtils"

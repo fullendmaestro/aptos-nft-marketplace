@@ -1,3 +1,4 @@
+// src\components\offer\AcceptOfferModal.tsx
 import React, { useState, useEffect } from "react"
 import { Modal, List, Button, message } from "antd"
 import { NFTWithDetails, Offer } from "../../types"

@@ -1,3 +1,4 @@
+// src\components\offer\CreateOfferModal.tsx
 import React, { useState } from "react"
 import { Modal, Form, Input, Button, message } from "antd"
 import { NFTWithDetails } from "../../types"

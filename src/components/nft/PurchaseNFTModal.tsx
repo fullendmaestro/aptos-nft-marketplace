@@ -1,3 +1,4 @@
+// src\components\nft\PurchaseNFTModal.tsx
 import React, { useState } from "react"
 import { Modal, Form, Input, Button, message } from "antd"
 import { ListedNFT, NFTWithDetails } from "../../types"

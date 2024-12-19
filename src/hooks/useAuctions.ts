@@ -1,3 +1,5 @@
+// src\hooks\useAuctions.ts
+
 import { useState, useEffect } from "react"
 import { NFTWithDetails } from "../types"
 import {

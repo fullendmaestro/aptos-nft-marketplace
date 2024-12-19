@@ -1,3 +1,4 @@
+// src\components\auction\AuctionCard.tsx
 import React, { useState } from "react"
 import { Card, Tag, Button, Statistic } from "antd"
 import { AuctionData } from "../../types"
