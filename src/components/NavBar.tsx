@@ -1,25 +1,22 @@
+// src\components\Navbar.tsx
 import React, { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import {
   Layout,
   Typography,
-  Menu,
   Space,
   Button,
   Dropdown,
   message,
+  Menu,
 } from "antd"
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design"
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { AptosClient } from "aptos"
-import {
-  AccountBookOutlined,
-  DownOutlined,
-  LogoutOutlined,
-} from "@ant-design/icons"
-import { Link } from "react-router-dom"
+import { DownOutlined, LogoutOutlined } from "@ant-design/icons"
 
-// const { Header } = Layout
+const { Header } = Layout
 const { Text } = Typography
 
 const client = new AptosClient("https://fullnode.devnet.aptoslabs.com/v1")
@@ -29,16 +26,14 @@ interface NavBarProps {
 }
 
 const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
-  const { connected, account, network, disconnect } = useWallet() // Add disconnect here
+  const { connected, account, network, disconnect } = useWallet()
   const [balance, setBalance] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchBalance = async () => {
       if (account) {
         try {
-          const resources: any[] = await client.getAccountResources(
-            account.address,
-          )
+          const resources = await client.getAccountResources(account.address)
           const accountResource = resources.find(
             r => r.type === "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
           )
@@ -61,8 +56,8 @@ const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
 
   const handleLogout = async () => {
     try {
-      await disconnect() // Disconnect the wallet
-      setBalance(null) // Clear balance on logout
+      await disconnect()
+      setBalance(null)
       message.success("Disconnected from wallet")
     } catch (error) {
       console.error("Error disconnecting wallet:", error)
@@ -71,82 +66,73 @@ const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
   }
 
   return (
-    // <Header>
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between">
-          <div className="flex space-x-7">
-            <div>
-              <Link to="/" className="flex items-center py-4 px-2">
-                <img
-                  src="/Aptos_Primary_WHT.png"
-                  alt="Aptos Logo"
-                  style={{ height: "30px", marginRight: 16 }}
-                />
-              </Link>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Link
-              to="/"
-              className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-gray-100 hover:text-gray-900 transition duration-300"
-            >
-              Home
-            </Link>
-            <Link
-              to="/my-nfts"
-              className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-gray-100 hover:text-gray-900 transition duration-300"
-            >
-              My NFTs
-            </Link>
-            <Link
-              to="/create-nft"
-              className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-gray-100 hover:text-gray-900 transition duration-300"
-            >
-              Create NFT
-            </Link>
-            <Space style={{ alignItems: "center" }}>
-              {connected && account ? (
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item key="address">
-                        <Text strong>Address:</Text> <br />
-                        <Text copyable>{account.address}</Text>
-                      </Menu.Item>
-                      <Menu.Item key="network">
-                        <Text strong>Network:</Text>{" "}
-                        {network ? network.name : "Unknown"}
-                      </Menu.Item>
-                      <Menu.Item key="balance">
-                        <Text strong>Balance:</Text>{" "}
-                        {balance !== null ? `${balance} APT` : "Loading..."}
-                      </Menu.Item>
-                      <Menu.Divider />
-                      <Menu.Item
-                        key="logout"
-                        icon={<LogoutOutlined />}
-                        onClick={handleLogout}
-                      >
-                        Log Out
-                      </Menu.Item>
-                    </Menu>
-                  }
-                  trigger={["click"]}
-                >
-                  <Button type="primary">
-                    Connected <DownOutlined />
-                  </Button>
-                </Dropdown>
-              ) : (
-                <WalletSelector />
-              )}
-            </Space>
-          </div>
+    <Header className="flex justify-between items-center bg-gray-800 px-6 h-16">
+      <div className="flex items-center">
+        <img
+          src="/Aptos_Primary_WHT.png"
+          alt="Aptos Logo"
+          className="h-8 mr-6"
+        />
+        <div className="flex items-center space-x-6">
+          <Link
+            to="/"
+            className="text-white hover:text-gray-300 transition-colors"
+          >
+            Marketplace
+          </Link>
+          <Link
+            to="/my-nfts"
+            className="text-white hover:text-gray-300 transition-colors"
+          >
+            My Collection
+          </Link>
+          <button
+            onClick={onMintNFTClick}
+            className="text-white hover:text-gray-300 transition-colors"
+          >
+            Mint NFT
+          </button>
         </div>
       </div>
-    </nav>
-    // </Header>
+
+      <Space className="items-center">
+        {connected && account ? (
+          <Dropdown
+            overlay={
+              <Menu>
+                <Menu.Item key="address">
+                  <Text strong>Address:</Text> <br />
+                  <Text copyable>{account.address}</Text>
+                </Menu.Item>
+                <Menu.Item key="network">
+                  <Text strong>Network:</Text>{" "}
+                  {network ? network.name : "Unknown"}
+                </Menu.Item>
+                <Menu.Item key="balance">
+                  <Text strong>Balance:</Text>{" "}
+                  {balance !== null ? `${balance} APT` : "Loading..."}
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                  key="logout"
+                  icon={<LogoutOutlined />}
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </Menu.Item>
+              </Menu>
+            }
+            trigger={["click"]}
+          >
+            <Button type="primary">
+              Connected <DownOutlined />
+            </Button>
+          </Dropdown>
+        ) : (
+          <WalletSelector />
+        )}
+      </Space>
+    </Header>
   )
 }
 
