@@ -1,24 +1,22 @@
 // src\components\nft\NFTList.tsx
 import React from "react"
 import { Row, Col, Empty } from "antd"
-import { AuctionData, ListedNFT, NFTWithDetails, OfferData } from "../../types"
+import { NFTDataList } from "../../types"
 import NFTCard from "./NFTCard"
 import Pagination from "../common/Pagination"
 import ListedNFTCard from "./ListedNFTCard"
 import AuctionCard from "../auction/AuctionCard"
 import UserNFTCard from "./userNFTCard"
 import UserAuctionCard from "../auction/UserAuctionCard"
-import UserOffersCard from "../offer/UserOfferCard"
 import UserOfferCard from "../offer/UserOfferCard"
 import { O } from "vitest/dist/reporters-yx5ZTtEV.js"
 
 interface NFTListProps {
-  nfts: NFTWithDetails[] | AuctionData[] | OfferData[] | ListedNFT[]
+  nfts: NFTDataList
   tabType: string
 }
 
 const NFTList: React.FC<NFTListProps> = ({ nfts, tabType }) => {
-  console.log("auctionNFTs.... argv", nfts, tabType)
   const [currentPage, setCurrentPage] = React.useState(1)
   const pageSize = 8
 
@@ -30,8 +28,6 @@ const NFTList: React.FC<NFTListProps> = ({ nfts, tabType }) => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   )
-
-  console.log("tabtype and its nfts", tabType, nfts)
 
   return (
     <>

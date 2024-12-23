@@ -2,7 +2,6 @@
 import React, { useState } from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { Layout, Modal, Form, Input, Select, Button, message } from "antd"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
 import NavBar from "./components/NavBar"
 import MarketView from "./pages/MarketView"
@@ -12,7 +11,6 @@ import { client } from "./utils/aptosUtils"
 import Home from "./pages/Home"
 
 function App() {
-  const { signAndSubmitTransaction } = useWallet()
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const handleMintNFTClick = () => setIsModalVisible(true)

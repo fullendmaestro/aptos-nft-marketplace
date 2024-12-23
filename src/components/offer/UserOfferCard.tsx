@@ -16,10 +16,7 @@ interface UserOfferCardProps {
   onOfferAccepted: () => void
 }
 
-const UserOfferCard: React.FC<UserOfferCardProps> = ({
-  offer,
-  onOfferAccepted,
-}) => {
+const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
   const [loading, setLoading] = useState<string | null>(null)
   const { account } = useWallet()
 
@@ -28,9 +25,8 @@ const UserOfferCard: React.FC<UserOfferCardProps> = ({
 
     setLoading(offer.nft_id)
     try {
-      await acceptOffer(account.address, parseInt(offer.nft_id))
+      await acceptOffer(offer.nft_id, offer.buyer)
       message.success("Offer accepted successfully!")
-      onOfferAccepted()
     } catch (error) {
       console.error("Error accepting offer:", error)
       message.error("Failed to accept offer")

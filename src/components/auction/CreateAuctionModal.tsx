@@ -31,7 +31,6 @@ const CreateAuctionModal: React.FC<CreateAuctionModalProps> = ({
     setLoading(true)
     try {
       await createAuction(
-        account.address,
         nft.id,
         values.startPrice,
         values.duration * 3600, // Convert hours to seconds

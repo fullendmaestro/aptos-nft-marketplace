@@ -12,15 +12,9 @@ const { Meta } = Card
 
 interface ListedNFTCardProps {
   listing: ListedNFT
-  onBuyClick: (nft: NFT) => void
-  onNFTClick: (nft: NFT) => void
-  showOfferOption?: boolean
 }
 
-const ListedNFTCard: React.FC<ListedNFTCardProps> = ({
-  listing,
-  onNFTClick,
-}) => {
+const ListedNFTCard: React.FC<ListedNFTCardProps> = ({ listing }) => {
   console.log("listed nft", listing)
   const [isBuyModalVisible, setIsBuyModalVisible] = useState(false)
   const handleBuyClick = (nft: ListedNFT) => {
@@ -48,13 +42,7 @@ const ListedNFTCard: React.FC<ListedNFTCardProps> = ({
       <Card
         hoverable
         className="w-full max-w-[240px] mx-auto"
-        cover={
-          <img
-            alt={listing.name}
-            src={listing.uri}
-            onClick={() => onNFTClick(listing)}
-          />
-        }
+        cover={<img alt={listing.name} src={listing.uri} />}
         actions={[
           <Button type="link" onClick={() => handleBuyClick(listing)}>
             Buy

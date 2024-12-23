@@ -6,6 +6,7 @@ import {
   Auction,
   AuctionData,
   ListedNFT,
+  NFTDataList,
 } from "../types"
 import {
   fetchAvailableNFTs,
@@ -19,14 +20,14 @@ import {
 import { marketplaceAddr } from "@/constants"
 
 export const useNFTs = (tab: MarketplaceTab, rarity?: "all" | number) => {
-  const [nfts, setNFTs] = useState<NFTWithDetails[]>([])
+  const [nfts, setNFTs] = useState<NFTDataList>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchNFTs = async () => {
     try {
       setLoading(true)
-      let fetchedNFTs: NFTWithDetails[] | AuctionData[] | ListedNFT[] = []
+      let fetchedNFTs: NFTDataList = []
 
       switch (tab) {
         case "available":

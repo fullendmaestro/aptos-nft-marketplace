@@ -91,9 +91,7 @@ export const fetchNFTDetails = async (nft_id: string): Promise<NFT> => {
   }
 }
 
-export const fetchAuctionDetails = async (
-  nft_id: string,
-): Promise<Auction | null> => {
+export const fetchAuctionDetails = async (nft_id: string): Promise<Auction> => {
   try {
     const response = await client.view({
       function: `${marketplaceAddr}::NFTMarketplace::get_auction_details`,

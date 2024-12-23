@@ -1,13 +1,13 @@
 // src\components\offer\CreateOfferModal.tsx
 import React, { useState } from "react"
 import { Modal, Form, Input, Button, message } from "antd"
-import { NFTWithDetails } from "../../types"
+import { NFT, NFTWithDetails } from "../../types"
 import { createOffer } from "../../utils/aptosUtils"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
 interface CreateOfferModalProps {
   visible: boolean
-  nft: NFTWithDetails
+  nft: NFT
   onCancel: () => void
   onSuccess: () => void
 }
@@ -28,7 +28,6 @@ const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
     setLoading(true)
     try {
       await createOffer(
-        account.address,
         nft.id,
         values.price,
         values.duration * 3600, // Convert hours to seconds

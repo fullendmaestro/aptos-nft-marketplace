@@ -15,6 +15,7 @@ import "@aptos-labs/wallet-adapter-ant-design/dist/index.css"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { AptosClient } from "aptos"
 import { DownOutlined, LogoutOutlined } from "@ant-design/icons"
+import { truncateAddress } from "@/lib/utils"
 
 const { Header } = Layout
 const { Text } = Typography
@@ -102,7 +103,7 @@ const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
               <Menu>
                 <Menu.Item key="address">
                   <Text strong>Address:</Text> <br />
-                  <Text copyable>{account.address}</Text>
+                  <Text copyable>{truncateAddress(account.address)}</Text>
                 </Menu.Item>
                 <Menu.Item key="network">
                   <Text strong>Network:</Text>{" "}

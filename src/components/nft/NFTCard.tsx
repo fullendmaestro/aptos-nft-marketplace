@@ -11,11 +11,9 @@ const { Meta } = Card
 
 interface NFTCardProps {
   nft: NFT
-  onBuyClick: (nft: NFT) => void
-  onNFTClick: (nft: NFT) => void
 }
 
-const NFTCard: React.FC<NFTCardProps> = ({ nft, onBuyClick, onNFTClick }) => {
+const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
   console.log("nft", nft)
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false)
 
@@ -37,9 +35,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBuyClick, onNFTClick }) => {
       <Card
         hoverable
         className="w-full max-w-[240px] mx-auto"
-        cover={
-          <img alt={nft.name} src={nft.uri} onClick={() => onNFTClick(nft)} />
-        }
+        cover={<img alt={nft.name} src={nft.uri} />}
         actions={[
           <Button key="offer" type="link" onClick={handleCreateOffer}>
             Make Offer
@@ -66,7 +62,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ nft, onBuyClick, onNFTClick }) => {
         visible={isOfferModalVisible}
         nft={nft}
         onCancel={handleOfferModalCancel}
-        onOfferCreated={handleOfferCreated}
+        onSuccess={handleOfferCreated}
       />
     </>
   )

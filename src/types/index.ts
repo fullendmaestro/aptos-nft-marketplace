@@ -1,7 +1,13 @@
 // src\types\index.ts
 import { Types } from "aptos"
 
-export type NFTStatus = "available" | "listed" | "in_auction" | "has_offers"
+export type NFTStatus =
+  | "available"
+  | "listed"
+  | "in_auction"
+  | "has_offers"
+  | undefined
+  | string
 
 export type NFT = {
   id: number
@@ -10,21 +16,15 @@ export type NFT = {
   description: string
   uri: string
   rarity: number
+  status?: NFTStatus
 }
 
 export type OwnedNFT = NFT & {
   status: NFTStatus
 }
 
-export type ListedNFT = {
-  id: number
-  owner: string
-  name: string
-  description: string
-  uri: string
-  price: number
+export type ListedNFT = NFT & {
   for_sale: boolean
-  rarity: number
 }
 
 export type Auction = {
@@ -62,6 +62,9 @@ export type AuctionData = {
   status: string
   auction: Auction
 }
+
+export type NFTData = NFT | AuctionData | OfferData | ListedNFT
+export type NFTDataList = NFT[] | AuctionData[] | OfferData[] | ListedNFT[]
 
 export type OfferData = NFT & {
   offers: Offer[]

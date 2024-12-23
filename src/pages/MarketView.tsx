@@ -20,14 +20,11 @@ const MarketView: React.FC = () => {
     "available",
     rarity,
   )
-  console.log("availableNFTs", availableNFTs)
   const { nfts: listedNFTs, loading: loadingListed } = useNFTs("listed", rarity)
-  console.log("listedNFTs", listedNFTs)
   const { nfts: auctionNFTs, loading: loadingAuctions } = useNFTs(
     "auctions",
     rarity,
   )
-  console.log("auctionNFTs", auctionNFTs)
 
   const getTabContent = (
     nfts: NFTWithDetails[],

@@ -1,12 +1,9 @@
 // src\components\auction\UserAuctionCard.tsx
 import React, { useState } from "react"
 import { Card, Tag, Button, message, Statistic } from "antd"
-import { AuctionData, OfferData } from "../../types"
+import { AuctionData } from "../../types"
 import { truncateAddress } from "@/lib/utils"
 import { rarityColors, rarityLabels } from "@/constants"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import { client } from "@/utils/aptosUtils"
-import { marketplaceAddr } from "@/constants"
 import EndAuctionModal from "./EndAuctionModal"
 
 const { Meta } = Card
@@ -14,19 +11,14 @@ const { Countdown } = Statistic
 
 interface UserAuctionCardProps {
   auction: AuctionData
-  // onOfferAccepted?: () => void
 }
 
-const UserAuctionCard: React.FC<UserAuctionCardProps> = ({
-  auction,
-  // onOfferAccepted,
-}) => {
-  console.log("this is the user return auction card arg auction", auction)
+const UserAuctionCard: React.FC<UserAuctionCardProps> = ({ auction }) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const showModal = () => setIsModalVisible(true)
   const handleCancel = () => setIsModalVisible(false)
-  const handleBidPlaced = () => {
+  const handleAuctionEnded = () => {
     // Refresh auction data or update UI as needed
   }
 
@@ -42,7 +34,7 @@ const UserAuctionCard: React.FC<UserAuctionCardProps> = ({
             onClick={showModal}
             disabled={!auction.auction.is_active}
           >
-            Place Bid
+            End Auction
           </Button>,
         ]}
       >
@@ -63,17 +55,20 @@ const UserAuctionCard: React.FC<UserAuctionCardProps> = ({
         <p>Seller: {truncateAddress(auction.auction.seller)}</p>
         <p>Highest Bidder: {truncateAddress(auction.auction.highest_bidder)}</p>
         <p>Status: {auction.status}</p>
-        <Countdown
-          title="Time Left"
-          value={auction.auction.end_time * 1000}
-          format="D [days] H [hrs] m [mins] s [secs]"
-        />
+        <div className="mt-4 p-2 bg-gray-100 rounded-lg">
+          <Countdown
+            title={<span className="text-lg font-semibold">Time Left</span>}
+            value={auction.auction.end_time * 1000}
+            format="D [days] H [hrs] m [mins] s [secs]"
+            className="text-center"
+          />
+        </div>
       </Card>
       <EndAuctionModal
         visible={isModalVisible}
         auction={auction}
         onCancel={handleCancel}
-        onBidPlaced={handleBidPlaced}
+        onAuctionEnded={handleAuctionEnded}
       />
     </>
   )

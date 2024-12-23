@@ -31,7 +31,7 @@ const PlaceBidModal: React.FC<PlaceBidModalProps> = ({
 
     setLoading(true)
     try {
-      await placeBid(account.address, auction.id, values.bidAmount)
+      await placeBid(auction.id, values.bidAmount)
       message.success("Bid placed successfully!")
       onBidPlaced()
       onCancel()
@@ -99,23 +99,3 @@ const PlaceBidModal: React.FC<PlaceBidModalProps> = ({
 }
 
 export default PlaceBidModal
-
-// {
-//   "current_bid": 0.5,
-//   "end_time": "1734445381",
-//   "highest_bidder": "0x29f95737c58925e13cd10b8dc1d98109339e2442b2ea1938f454ca816b7d0914",
-//   "is_active": true,
-//   "nft_id": "9",
-//   "seller": "0x29f95737c58925e13cd10b8dc1d98109339e2442b2ea1938f454ca816b7d0914",
-//   "start_price": 0.5,
-//   "nft_detail": {
-//       "id": "9",
-//       "owner": "0x29f95737c58925e13cd10b8dc1d98109339e2442b2ea1938f454ca816b7d0914",
-//       "name": "Auct",
-//       "description": "A waterfall that flows endlessly, reflecting the infinite beauty of nature.",
-//       "uri": "https://fastly.picsum.photos/id/802/200/200.jpg?hmac=alfo3M8Ps4XWmFJGIwuzLUqOrwxqkE5_f65vCtk6_Iw",
-//       "price": 0,
-//       "for_sale": true,
-//       "rarity": 4
-//   }
-// }

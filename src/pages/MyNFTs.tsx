@@ -1,8 +1,14 @@
-// src\pages\MyNFTs.tsx
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Typography, Tabs, Spin } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import { MyNFTsTab } from "../types"
+import {
+  AuctionData,
+  ListedNFT,
+  MyNFTsTab,
+  NFT,
+  NFTDataList,
+  OfferData,
+} from "../types"
 import NFTList from "../components/nft/NFTList"
 import { useMyNFTs } from "@/hooks/useMyNFTs"
 
@@ -12,14 +18,21 @@ const { TabPane } = Tabs
 const MyNFTs: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MyNFTsTab>("owned")
   const { connected, account } = useWallet()
-
   const { ownedNFTs, auctionNFTs, offerNFTs, loading } = useMyNFTs(
     account?.address,
   )
 
-  console.log("ownedNFTs", ownedNFTs)
-  console.log("auctionNFTs", auctionNFTs)
-  console.log("offerNFTs", offerNFTs)
+  const [displayedNFTs, setDisplayedNFTs] = useState<NFTDataList>([])
+
+  useEffect(() => {
+    if (activeTab === "owned") {
+      setDisplayedNFTs(ownedNFTs)
+    } else if (activeTab === "in-auction") {
+      setDisplayedNFTs(auctionNFTs)
+    } else if (activeTab === "offers") {
+      setDisplayedNFTs(offerNFTs)
+    }
+  }, [activeTab, ownedNFTs, auctionNFTs, offerNFTs])
 
   if (!connected) {
     return (
@@ -46,7 +59,7 @@ const MyNFTs: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <NFTList nfts={ownedNFTs} tabType={activeTab} />
+            <NFTList nfts={displayedNFTs} tabType={activeTab} />
           )}
         </TabPane>
 
@@ -56,7 +69,7 @@ const MyNFTs: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <NFTList nfts={auctionNFTs} tabType={activeTab} />
+            <NFTList nfts={displayedNFTs} tabType={activeTab} />
           )}
         </TabPane>
 
@@ -66,7 +79,7 @@ const MyNFTs: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <NFTList nfts={offerNFTs} tabType={activeTab} />
+            <NFTList nfts={displayedNFTs} tabType={activeTab} />
           )}
         </TabPane>
       </Tabs>

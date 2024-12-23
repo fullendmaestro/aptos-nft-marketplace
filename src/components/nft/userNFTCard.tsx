@@ -24,12 +24,11 @@ const { Option } = Select
 
 interface UserNFTCardProps {
   nft: OwnedNFT
-  onActionComplete?: () => void
 }
 
 type selectedAction = "sell" | "auction" | "transfer" | "offer"
 
-const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft, onActionComplete }) => {
+const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
   console.log("user nft card arg nft", nft)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [selectedAction, setSelectedAction] = useState<selectedAction>("sell")
@@ -99,7 +98,6 @@ const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft, onActionComplete }) => {
       message.success(`NFT ${selectedAction} successful!`)
       setIsModalVisible(false)
       form.resetFields()
-      onActionComplete?.()
     } catch (error) {
       console.error(`Error ${selectedAction}ing NFT:`, error)
       message.error(`Failed to ${selectedAction} NFT`)
