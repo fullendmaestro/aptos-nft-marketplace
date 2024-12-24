@@ -6,7 +6,6 @@ import { truncateAddress } from "../../lib/utils"
 import { rarityColors, rarityLabels } from "@/constants"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { acceptOffer, client } from "@/utils/aptosUtils"
-import { marketplaceAddr } from "@/constants"
 
 const { Meta } = Card
 const { Text } = Typography

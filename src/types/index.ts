@@ -24,6 +24,7 @@ export type OwnedNFT = NFT & {
 }
 
 export type ListedNFT = NFT & {
+  price: number
   for_sale: boolean
 }
 
@@ -52,14 +53,8 @@ export type NFTWithDetails = NFT & {
   offers?: Offer[]
 }
 
-export type AuctionData = {
-  id: number
-  owner: string
-  name: string
-  description: string
-  uri: string
-  rarity: number
-  status: string
+export type AuctionData = NFT & {
+  status: NFTStatus
   auction: Auction
 }
 
@@ -71,4 +66,4 @@ export type OfferData = NFT & {
 }
 
 export type MarketplaceTab = "available" | "listed" | "auctions"
-export type MyNFTsTab = "owned" | "in-auction" | "offers"
+export type MyNFTsTab = "owned" | "in-auction" | "offers" | "o-offers"

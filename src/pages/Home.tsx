@@ -3,7 +3,7 @@ const Home = () => {
   return (
     <div className="text-center">
       <h1 className="text-4xl font-bold mb-4">
-        Welcome to MegaNFT Marketplace
+        Welcome to AptosNFT Marketplace
       </h1>
       <p className="text-xl mb-8">
         Discover, collect, and trade unique digital assets on the Aptos

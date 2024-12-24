@@ -15,3 +15,4 @@ export const rarityLabels: { [key: number]: string } = {
   3: "Rare",
   4: "Super Rare",
 }
+export const moduleName = "NFTMarketplace"

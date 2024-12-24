@@ -74,6 +74,9 @@ export const useMyNFTs = (address?: string) => {
     fetchNFTs()
   }, [address])
 
+  console.log("rtn this is the auction nfts", auctionNFTs)
+  console.log("rtn this is the offer nfts", offerNFTs)
+  console.log("rtn this is the owned nfts", ownedNFTs)
   return {
     ownedNFTs,
     auctionNFTs,

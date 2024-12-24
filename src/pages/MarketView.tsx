@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { Typography, Tabs, Spin } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import { NFTWithDetails, MarketplaceTab } from "../types"
+import { NFTWithDetails, MarketplaceTab, NFTDataList } from "../types"
 import RarityFilter from "../components/common/RarityFilter"
 import NFTList from "../components/nft/NFTList"
 import { useNFTs } from "../hooks/useNFTs"
@@ -27,7 +27,7 @@ const MarketView: React.FC = () => {
   )
 
   const getTabContent = (
-    nfts: NFTWithDetails[],
+    nfts: NFTDataList,
     loading: boolean,
     tabType: string,
   ) => {

@@ -16,23 +16,24 @@ const { Title } = Typography
 const { TabPane } = Tabs
 
 const MyNFTs: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MyNFTsTab>("owned")
+  const [activeTab, setActiveTab] = useState<MyNFTsTab>("in-auction")
   const { connected, account } = useWallet()
   const { ownedNFTs, auctionNFTs, offerNFTs, loading } = useMyNFTs(
     account?.address,
   )
 
-  const [displayedNFTs, setDisplayedNFTs] = useState<NFTDataList>([])
+  // const [displayedNFTs, setDisplayedNFTs] = useState<NFTDataList>([])
 
-  useEffect(() => {
-    if (activeTab === "owned") {
-      setDisplayedNFTs(ownedNFTs)
-    } else if (activeTab === "in-auction") {
-      setDisplayedNFTs(auctionNFTs)
-    } else if (activeTab === "offers") {
-      setDisplayedNFTs(offerNFTs)
-    }
-  }, [activeTab, ownedNFTs, auctionNFTs, offerNFTs])
+  // useEffect(() => {
+  //   if (activeTab === "owned") {
+  //     setDisplayedNFTs(ownedNFTs)
+  //   } else if (activeTab === "in-auction") {
+  //     setDisplayedNFTs(auctionNFTs)
+  //   } else if (activeTab === "offers") {
+  //     setDisplayedNFTs(offerNFTs)
+  //   }
+  // }, [activeTab])
+  // [activeTab, ownedNFTs, auctionNFTs, offerNFTs]
 
   if (!connected) {
     return (
@@ -59,7 +60,7 @@ const MyNFTs: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <NFTList nfts={displayedNFTs} tabType={activeTab} />
+            <NFTList nfts={ownedNFTs} tabType={activeTab} />
           )}
         </TabPane>
 
@@ -69,7 +70,7 @@ const MyNFTs: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <NFTList nfts={displayedNFTs} tabType={activeTab} />
+            <NFTList nfts={auctionNFTs} tabType={activeTab} />
           )}
         </TabPane>
 
@@ -79,8 +80,14 @@ const MyNFTs: React.FC = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <NFTList nfts={displayedNFTs} tabType={activeTab} />
+            <NFTList nfts={offerNFTs} tabType={activeTab} />
           )}
+        </TabPane>
+        <TabPane tab="Outgoing Offers" key="o-offers">
+          {/* Implement this tab for users to see which offers they have sent, so
+          that they can cancel it. Also include a button for user to update
+          offer which will cancel the previous offer and then create a new
+          offer. */}
         </TabPane>
       </Tabs>
     </div>

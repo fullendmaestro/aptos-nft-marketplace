@@ -34,7 +34,8 @@ export const useNFTs = (tab: MarketplaceTab, rarity?: "all" | number) => {
           fetchedNFTs = await fetchAvailableNFTs()
           break
         case "listed":
-          fetchedNFTs = await fetchListedNFTs()
+          fetchedNFTs = await fetchListedNFTs(1)
+          console.log("fetched listed nfts", fetchedNFTs)
           break
         case "auctions":
           // Fetch all auctions
