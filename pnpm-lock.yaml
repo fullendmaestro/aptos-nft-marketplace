@@ -68,6 +68,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.1
         version: 18.3.5(@types/react@18.3.16)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.3.4(vite@5.4.11(@types/node@16.18.122)(terser@5.37.0))
       ajv:
         specifier: ^8.17.1
         version: 8.17.1
@@ -122,6 +125,9 @@ importers:
       typescript:
         specifier: ^4.9.5
         version: 4.9.5
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@16.18.122)(jsdom@23.2.0)(terser@5.37.0)
       web-vitals:
         specifier: ^2.1.4
         version: 2.1.4
@@ -132,9 +138,6 @@ importers:
       '@types/node':
         specifier: ^16.18.122
         version: 16.18.122
-      '@vitejs/plugin-react':
-        specifier: ^4.3.4
-        version: 4.3.4(vite@5.4.11(@types/node@16.18.122)(terser@5.37.0))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -165,9 +168,6 @@ importers:
       vite:
         specifier: ^5.0.11
         version: 5.4.11(@types/node@16.18.122)(terser@5.37.0)
-      vitest:
-        specifier: ^1.6.0
-        version: 1.6.0(@types/node@16.18.122)(jsdom@23.2.0)(terser@5.37.0)
 
 packages:
 
