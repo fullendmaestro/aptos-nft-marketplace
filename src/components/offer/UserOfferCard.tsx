@@ -1,6 +1,6 @@
 // src\components\offer\UserOfferCard.tsx
 import React, { useState } from "react"
-import { Card, Tag, Button, message, List, Typography } from "antd"
+import { Card, Tag, Button, message, List, Typography, Modal } from "antd"
 import { NFT, Offer, OfferData } from "../../types"
 import { truncateAddress } from "../../lib/utils"
 import { rarityColors, rarityLabels } from "@/constants"
@@ -12,10 +12,10 @@ const { Text } = Typography
 
 interface UserOfferCardProps {
   offer: OfferData
-  onOfferAccepted: () => void
 }
 
 const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false)
   const [loading, setLoading] = useState<string | null>(null)
   const { account } = useWallet()
 
@@ -41,6 +41,11 @@ const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
       cover={
         <img alt={offer.name} src={offer.uri} className="h-48 object-cover" />
       }
+      actions={[
+        <Button type="link" onClick={() => setIsModalVisible(true)}>
+          View Details
+        </Button>,
+      ]}
     >
       <Tag
         color={rarityColors[offer.rarity]}
@@ -52,44 +57,52 @@ const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
       <Meta title={offer.name} description={offer.description} />
       <p className="mt-2 text-sm">ID: {offer.id}</p>
       <p className="text-sm">Owner: {truncateAddress(offer.owner)}</p>
+      <p className="text-sm">Offers: {offer.offers.length}</p>
 
-      <List
-        className="mt-4"
-        header={<div>Offers</div>}
-        itemLayout="horizontal"
-        dataSource={offer.offers}
-        renderItem={offer => (
-          <List.Item
-            actions={[
-              <Button
-                key="accept"
-                type="primary"
-                size="small"
-                onClick={() => handleAcceptOffer(offer)}
-                loading={loading === offer.nft_id}
-              >
-                Accept
-              </Button>,
-            ]}
-          >
-            <List.Item.Meta
-              title={<Text>{parseFloat(offer.price) / 100000000} APT</Text>}
-              description={
-                <>
-                  <Text>Buyer: {truncateAddress(offer.buyer)}</Text>
-                  <br />
-                  <Text>
-                    Expires:{" "}
-                    {new Date(
-                      parseInt(offer.expiration_time) * 1000,
-                    ).toLocaleString()}
-                  </Text>
-                </>
-              }
-            />
-          </List.Item>
-        )}
-      />
+      <Modal
+        title={`Offers for ${offer.name}`}
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+      >
+        <List
+          className="mt-4"
+          header={<div>Offers</div>}
+          itemLayout="horizontal"
+          dataSource={offer.offers}
+          renderItem={offer => (
+            <List.Item
+              actions={[
+                <Button
+                  key="accept"
+                  type="primary"
+                  size="small"
+                  onClick={() => handleAcceptOffer(offer)}
+                  loading={loading === offer.nft_id}
+                >
+                  Accept
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                title={<Text>{parseFloat(offer.price) / 100000000} APT</Text>}
+                description={
+                  <>
+                    <Text>Buyer: {truncateAddress(offer.buyer)}</Text>
+                    <br />
+                    <Text>
+                      Expires:{" "}
+                      {new Date(
+                        parseInt(offer.expiration_time) * 1000,
+                      ).toLocaleString()}
+                    </Text>
+                  </>
+                }
+              />
+            </List.Item>
+          )}
+        />
+      </Modal>
     </Card>
   )
 }

@@ -1,36 +1,48 @@
-// src\pages\MarketView.tsx
-
-import React, { useState } from "react"
+import React, { useEffect } from "react"
 import { Typography, Tabs, Spin } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import { NFTWithDetails, MarketplaceTab, NFTDataList } from "../types"
+import { MarketplaceTab } from "../types"
 import RarityFilter from "../components/common/RarityFilter"
 import NFTList from "../components/nft/NFTList"
-import { useNFTs } from "../hooks/useNFTs"
+import { useAppDispatch, useAppSelector } from "../store/hooks"
+import { fetchMarketplaceNFTs } from "../store/slices/nftsSlice"
+import { fetchMarketplaceAuctions } from "../store/slices/auctionsSlice"
+import { setSelectedRarity, setViewType } from "../store/slices/userSlice"
 
 const { Title } = Typography
 const { TabPane } = Tabs
 
 const MarketView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MarketplaceTab>("available")
-  const [rarity, setRarity] = useState<"all" | number>("all")
   const { connected } = useWallet()
+  const dispatch = useAppDispatch()
 
-  const { nfts: availableNFTs, loading: loadingAvailable } = useNFTs(
-    "available",
-    rarity,
+  const { selectedRarity, viewType } = useAppSelector(state => state.user)
+  const { marketplaceNFTs, loading: nftsLoading } = useAppSelector(
+    state => state.nfts,
   )
-  const { nfts: listedNFTs, loading: loadingListed } = useNFTs("listed", rarity)
-  const { nfts: auctionNFTs, loading: loadingAuctions } = useNFTs(
-    "auctions",
-    rarity,
+  const { marketplaceAuctions, loading: auctionsLoading } = useAppSelector(
+    state => state.auctions,
   )
 
-  const getTabContent = (
-    nfts: NFTDataList,
-    loading: boolean,
-    tabType: string,
-  ) => {
+  useEffect(() => {
+    if (connected) {
+      if (viewType === "nfts" || viewType === "listed") {
+        dispatch(
+          fetchMarketplaceNFTs(
+            selectedRarity === "all" ? undefined : selectedRarity,
+          ),
+        )
+      } else if (viewType === "auctions") {
+        dispatch(
+          fetchMarketplaceAuctions(
+            selectedRarity === "all" ? undefined : selectedRarity,
+          ),
+        )
+      }
+    }
+  }, [dispatch, connected, viewType, selectedRarity])
+
+  const getTabContent = (tabType: MarketplaceTab) => {
     if (!connected) {
       return (
         <div className="text-center py-8">
@@ -39,37 +51,72 @@ const MarketView: React.FC = () => {
       )
     }
 
-    if (loading) {
-      return (
-        <div className="flex justify-center py-8">
-          <Spin size="large" />
-        </div>
-      )
+    switch (tabType) {
+      case "available":
+        return nftsLoading ? (
+          <div className="flex justify-center py-8">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <NFTList
+            nfts={marketplaceNFTs.filter(nft => !nft.for_sale)}
+            tabType={tabType}
+          />
+        )
+      case "listed":
+        return nftsLoading ? (
+          <div className="flex justify-center py-8">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <NFTList
+            nfts={marketplaceNFTs.filter(nft => nft.for_sale)}
+            tabType={tabType}
+          />
+        )
+      case "auctions":
+        return auctionsLoading ? (
+          <div className="flex justify-center py-8">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <NFTList
+            nfts={marketplaceAuctions.map(auction => ({
+              ...auction,
+              price: auction.auction.current_bid,
+              for_sale: true,
+            }))}
+            tabType={tabType}
+          />
+        )
     }
-
-    return <NFTList nfts={nfts} tabType={tabType} />
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <Title level={2}>NFT Marketplace</Title>
-        <RarityFilter rarity={rarity} onChange={value => setRarity(value)} />
+        <RarityFilter
+          rarity={selectedRarity}
+          onChange={value => dispatch(setSelectedRarity(value))}
+        />
       </div>
 
       <Tabs
-        activeKey={activeTab}
-        onChange={key => setActiveTab(key as MarketplaceTab)}
+        activeKey={viewType}
+        onChange={key =>
+          dispatch(setViewType(key as "nfts" | "auctions" | "offers"))
+        }
         className="mb-8"
       >
         <TabPane tab="Available NFTs" key="available">
-          {getTabContent(availableNFTs, loadingAvailable, "available")}
+          {getTabContent("available")}
         </TabPane>
         <TabPane tab="Listed NFTs" key="listed">
-          {getTabContent(listedNFTs, loadingListed, "listed")}
+          {getTabContent("listed")}
         </TabPane>
         <TabPane tab="Auctions" key="auctions">
-          {getTabContent(auctionNFTs, loadingAuctions, "auctions")}
+          {getTabContent("auctions")}
         </TabPane>
       </Tabs>
     </div>

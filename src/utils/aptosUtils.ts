@@ -1,4 +1,3 @@
-// src\utils\aptosUtils.ts
 import { AptosClient, Types } from "aptos"
 import {
   NFT,
@@ -9,7 +8,7 @@ import {
   AuctionData,
   OfferData,
 } from "../types"
-import { marketplaceAddr, moduleName } from "@/constants"
+import { marketplaceAddr } from "@/constants"
 
 export const client = new AptosClient(
   "https://fullnode.devnet.aptoslabs.com/v1",
@@ -32,33 +31,26 @@ export const fetchNFTs = async (selectedRarity?: number): Promise<NFT[]> => {
   try {
     const response = await client.getAccountResource(
       marketplaceAddr,
-      `${marketplaceAddr}::${moduleName}::Marketplace`,
+      `${marketplaceAddr}::NFTMarketplace::Marketplace`,
     )
+    const allNFTs = (response.data as any).nfts
     const listedNFTs = (response.data as { listed_nfts: ListedNFT[] })
       .listed_nfts
 
     const nftDetails = await Promise.all(
-      listedNFTs.map(async listedNFT => {
-        const nftDetailResponse = await client.view({
-          function: `${marketplaceAddr}::${moduleName}::get_nft_details`,
-          arguments: [marketplaceAddr, listedNFT.id.toString()],
-          type_arguments: [],
-        })
-
-        const [nftId, owner, name, description, uri, rarity] =
-          nftDetailResponse as [number, string, string, string, string, number]
-
+      allNFTs.map(async (nft: any) => {
+        const listedNFT = listedNFTs.find(listed => listed.nft_id === nft.id)
         return {
-          id: nftId,
-          owner,
-          name: new TextDecoder().decode(hexToUint8Array(name.slice(2))),
+          id: nft.id,
+          owner: nft.owner,
+          name: new TextDecoder().decode(hexToUint8Array(nft.name)),
           description: new TextDecoder().decode(
-            hexToUint8Array(description.slice(2)),
+            hexToUint8Array(nft.description),
           ),
-          uri: new TextDecoder().decode(hexToUint8Array(uri.slice(2))),
-          price: listedNFT.price / 100000000,
-          for_sale: true,
-          rarity,
+          uri: new TextDecoder().decode(hexToUint8Array(nft.uri)),
+          price: listedNFT ? listedNFT.price / 100000000 : 0,
+          for_sale: !!listedNFT,
+          rarity: nft.rarity,
         }
       }),
     )
@@ -74,7 +66,7 @@ export const fetchNFTs = async (selectedRarity?: number): Promise<NFT[]> => {
 
 export const fetchNFTDetails = async (nft_id: string): Promise<NFT> => {
   const response = await client.view({
-    function: `${marketplaceAddr}::${moduleName}::get_nft_details`,
+    function: `${marketplaceAddr}::NFTMarketplace::get_nft_details`,
     arguments: [marketplaceAddr, nft_id],
     type_arguments: [],
   })
@@ -96,7 +88,7 @@ export const fetchAuctionDetails = async (
 ): Promise<Auction | null> => {
   try {
     const response = await client.view({
-      function: `${marketplaceAddr}::${moduleName}::get_auction_details`,
+      function: `${marketplaceAddr}::NFTMarketplace::get_auction_details`,
       arguments: [marketplaceAddr, nft_id],
       type_arguments: [],
     })
@@ -125,7 +117,7 @@ export const fetchOfferDetails = async (
 ): Promise<Offer | null> => {
   try {
     const response = await client.view({
-      function: `${marketplaceAddr}::${moduleName}::get_offer_details`,
+      function: `${marketplaceAddr}::NFTMarketplace::get_offer_details`,
       arguments: [marketplaceAddr, nft_id, buyer],
       type_arguments: [],
     })
@@ -147,7 +139,7 @@ export const fetchOfferDetails = async (
 
 export const fetchAvailableNFTs = async (): Promise<NFTWithDetails[]> => {
   const response = await client.view({
-    function: `${marketplaceAddr}::${moduleName}::get_available_nfts`,
+    function: `${marketplaceAddr}::NFTMarketplace::get_available_nfts`,
     arguments: [marketplaceAddr],
     type_arguments: [],
   })
@@ -166,11 +158,158 @@ export const fetchAvailableNFTs = async (): Promise<NFTWithDetails[]> => {
   return nfts
 }
 
+export const fetchUserNFTs = async (userAddress: string): Promise<NFT[]> => {
+  try {
+    const marketplace = await client.getAccountResource(
+      marketplaceAddr,
+      `${marketplaceAddr}::NFTMarketplace::Marketplace`,
+    )
+
+    const allNFTs = (marketplace.data as any).nfts
+    const userNFTs = allNFTs.filter((nft: any) => nft.owner === userAddress)
+
+    const decodedNFTs = await Promise.all(
+      userNFTs.map(async (nft: any) => ({
+        id: nft.id,
+        owner: nft.owner,
+        name: hexToString(nft.name),
+        description: hexToString(nft.description),
+        uri: hexToString(nft.uri),
+        rarity: nft.rarity,
+      })),
+    )
+
+    const auctionNFTs = await fetchUserAuctionNFTs(userAddress)
+
+    // Fetch NFTs with offers
+    const offerNFTs = await fetchIncomingOffers(userAddress)
+
+    // Get NFTs that are not in auction or have offers
+    const auctionIds = new Set(auctionNFTs.map(nft => nft.id))
+    const offerIds = new Set(offerNFTs.map(nft => nft.id))
+
+    const availableNFTs = await Promise.all(
+      decodedNFTs
+        .filter((nft: any) => !auctionIds.has(nft.id) && !offerIds.has(nft.id))
+        .map(async (nft: any) => {
+          const details = await fetchNFTDetails(nft.id.toString())
+          return {
+            ...details,
+            status: "available" as const,
+          }
+        }),
+    )
+
+    return availableNFTs
+  } catch (error) {
+    console.error("Error fetching user NFTs:", error)
+    throw error
+  }
+}
+
+export const fetchAuctions = async (
+  selectedRarity?: number,
+): Promise<AuctionData[]> => {
+  try {
+    const response = await client.getAccountResource(
+      marketplaceAddr,
+      `${marketplaceAddr}::NFTMarketplace::Marketplace`,
+    )
+    const auctions = (response.data as any).auctions as Auction[]
+    const activeAuctions = auctions.filter(auction => auction.is_active)
+
+    const auctionDetails = await Promise.all(
+      activeAuctions.map(async auction => {
+        const nft = await fetchNFTDetails(auction.nft_id.toString())
+        return {
+          ...nft,
+          status: "in_auction" as const,
+          auction: {
+            ...auction,
+            current_bid: auction.current_bid / 100000000,
+            start_price: auction.start_price / 100000000,
+          },
+        }
+      }),
+    )
+
+    return selectedRarity
+      ? auctionDetails.filter(auction => auction.rarity === selectedRarity)
+      : auctionDetails
+  } catch (error) {
+    console.error("Error fetching auctions:", error)
+    throw error
+  }
+}
+
+export const fetchUserAuctions = async (
+  userAddress: string,
+): Promise<AuctionData[]> => {
+  try {
+    const response = await client.view({
+      function: `${marketplaceAddr}::NFTMarketplace::get_user_auction_nfts`,
+      arguments: [marketplaceAddr, userAddress],
+      type_arguments: [],
+    })
+
+    const nftIds = response[0] as string[]
+    const auctionDetails = await Promise.all(
+      nftIds.map(async id => {
+        const [nft, auction] = await Promise.all([
+          fetchNFTDetails(id),
+          fetchAuctionDetails(id),
+        ])
+        return {
+          ...nft,
+          status: "in_auction" as const,
+          auction: auction!,
+        }
+      }),
+    )
+
+    return auctionDetails
+  } catch (error) {
+    console.error("Error fetching user auctions:", error)
+    throw error
+  }
+}
+
+export const fetchOffers = async (
+  selectedRarity?: number,
+): Promise<OfferData[]> => {
+  try {
+    const response = await client.getAccountResource(
+      marketplaceAddr,
+      `${marketplaceAddr}::NFTMarketplace::Marketplace`,
+    )
+    const offers = (response.data as any).offers as Offer[]
+    const activeOffers = offers.filter(offer => offer.is_active)
+
+    const offerDetails = await Promise.all(
+      activeOffers.map(async offer => {
+        const nft = await fetchNFTDetails(offer.nft_id.toString())
+        return {
+          ...nft,
+          status: "has_offers" as const,
+          offers: [offer],
+        }
+      }),
+    )
+
+    return selectedRarity
+      ? offerDetails.filter(offer => offer.rarity === selectedRarity)
+      : offerDetails
+  } catch (error) {
+    console.error("Error fetching offers:", error)
+    throw error
+  }
+}
+
 export const fetchUserAuctionNFTs = async (
   userAddress: string,
 ): Promise<AuctionData[]> => {
   const response = await client.view({
-    function: `${marketplaceAddr}::${moduleName}::get_user_auction_nfts`,
+    function: `${marketplaceAddr}::NFTMarketplace::get_user_auction_nfts`,
     arguments: [marketplaceAddr, userAddress],
     type_arguments: [],
   })
@@ -197,7 +336,7 @@ export const fetchIncomingOffers = async (
   userAddress: string,
 ): Promise<OfferData[]> => {
   const response = await client.view({
-    function: `${marketplaceAddr}::${moduleName}::get_incoming_offers`,
+    function: `${marketplaceAddr}::NFTMarketplace::get_incoming_offers`,
     arguments: [marketplaceAddr, userAddress],
     type_arguments: [],
   })
@@ -221,7 +360,7 @@ export const fetchIncomingOffers = async (
 export const fetchNFTOffers = async (nft_id: string): Promise<Offer[]> => {
   const marketplace = await client.getAccountResource(
     marketplaceAddr,
-    `${marketplaceAddr}::${moduleName}::Marketplace`,
+    `${marketplaceAddr}::NFTMarketplace::Marketplace`,
   )
 
   const offers = (marketplace.data as any).offers as Offer[]
@@ -243,7 +382,7 @@ export const mintNFT = async (
 
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::mint_nft`,
+    function: `${marketplaceAddr}::NFTMarketplace::mint_nft`,
     type_arguments: [],
     arguments: [marketplaceAddr, nameBytes, descriptionBytes, uriBytes, rarity],
   }
@@ -260,7 +399,7 @@ export const createAuction = async (
 ): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::create_auction`,
+    function: `${marketplaceAddr}::NFTMarketplace::create_auction`,
     type_arguments: [],
     arguments: [
       marketplaceAddr,
@@ -281,7 +420,7 @@ export const placeBid = async (
 ): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::place_bid`,
+    function: `${marketplaceAddr}::NFTMarketplace::place_bid`,
     type_arguments: [],
     arguments: [marketplaceAddr, nft_id, (bid_amount * 100000000).toString()],
   }
@@ -294,7 +433,7 @@ export const placeBid = async (
 export const endAuction = async (nft_id: number): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::end_auction`,
+    function: `${marketplaceAddr}::NFTMarketplace::end_auction`,
     type_arguments: [],
     arguments: [marketplaceAddr, nft_id],
   }
@@ -311,7 +450,7 @@ export const createOffer = async (
 ): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::create_offer`,
+    function: `${marketplaceAddr}::NFTMarketplace::create_offer`,
     type_arguments: [],
     arguments: [
       marketplaceAddr,
@@ -332,7 +471,7 @@ export const acceptOffer = async (
 ): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::accept_offer`,
+    function: `${marketplaceAddr}::NFTMarketplace::accept_offer`,
     type_arguments: [],
     arguments: [marketplaceAddr, nft_id, buyer],
   }
@@ -345,7 +484,7 @@ export const acceptOffer = async (
 export const cancelOffer = async (nft_id: number): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::cancel_offer`,
+    function: `${marketplaceAddr}::NFTMarketplace::cancel_offer`,
     type_arguments: [],
     arguments: [marketplaceAddr, nft_id],
   }
@@ -361,7 +500,7 @@ export const transferNFT = async (
 ): Promise<string> => {
   const payload: Types.TransactionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::transfer_ownership`,
+    function: `${marketplaceAddr}::NFTMarketplace::transfer_ownership`,
     type_arguments: [],
     arguments: [marketplaceAddr, nft_id, recipient],
   }
@@ -376,7 +515,7 @@ export const purchaseNFT = async (selectedNft: ListedNFT): Promise<string> => {
 
   const entryFunctionPayload = {
     type: "entry_function_payload",
-    function: `${marketplaceAddr}::${moduleName}::purchase_nft`,
+    function: `${marketplaceAddr}::NFTMarketplace::purchase_nft`,
     type_arguments: [],
     arguments: [marketplaceAddr, selectedNft.id.toString()],
   }
@@ -386,4 +525,32 @@ export const purchaseNFT = async (selectedNft: ListedNFT): Promise<string> => {
   )
   await client.waitForTransaction(response.hash)
   return response.hash
+}
+
+export const isNFTForSale = async (nftId: string): Promise<boolean> => {
+  try {
+    const response = await client.view({
+      function: `${marketplaceAddr}::NFTMarketplace::is_nft_for_sale`,
+      arguments: [marketplaceAddr, nftId],
+      type_arguments: [],
+    })
+    return response[0] as boolean
+  } catch (error) {
+    console.error("Error checking if NFT is for sale:", error)
+    return false
+  }
+}
+
+export const getNFTPrice = async (nftId: string): Promise<number> => {
+  try {
+    const response = await client.view({
+      function: `${marketplaceAddr}::NFTMarketplace::get_nft_price`,
+      arguments: [marketplaceAddr, nftId],
+      type_arguments: [],
+    })
+    return (response[0] as number) / 100000000
+  } catch (error) {
+    console.error("Error getting NFT price:", error)
+    return 0
+  }
 }
