@@ -5,7 +5,7 @@ import NFTCard from "./NFTCard"
 import Pagination from "../common/Pagination"
 import ListedNFTCard from "./ListedNFTCard"
 import AuctionCard from "../auction/AuctionCard"
-import UserNFTCard from "./UserNFTCard"
+import UserNFTCard from "./userNFTCard"
 import UserAuctionCard from "../auction/UserAuctionCard"
 import UserOfferCard from "../offer/UserOfferCard"
 

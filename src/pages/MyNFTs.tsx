@@ -47,10 +47,7 @@ const MyNFTs: React.FC = () => {
             <Spin size="large" />
           </div>
         ) : (
-          <NFTList
-            nfts={userNFTs.filter(nft => !nft.for_sale)}
-            tabType={tabType}
-          />
+          <NFTList nfts={userNFTs} tabType={tabType} />
         )
       case "in-auction":
         return auctionsLoading ? (

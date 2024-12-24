@@ -22,7 +22,7 @@ const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
   const handleAcceptOffer = async (offer: Offer) => {
     if (!account) return
 
-    setLoading(offer.nft_id)
+    setLoading(String(offer.nft_id))
     try {
       await acceptOffer(offer.nft_id, offer.buyer)
       message.success("Offer accepted successfully!")
@@ -78,14 +78,14 @@ const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
                   type="primary"
                   size="small"
                   onClick={() => handleAcceptOffer(offer)}
-                  loading={loading === offer.nft_id}
+                  loading={loading === String(offer.nft_id)}
                 >
                   Accept
                 </Button>,
               ]}
             >
               <List.Item.Meta
-                title={<Text>{parseFloat(offer.price) / 100000000} APT</Text>}
+                title={<Text>{Number(offer.price) / 100000000} APT</Text>}
                 description={
                   <>
                     <Text>Buyer: {truncateAddress(offer.buyer)}</Text>
@@ -93,7 +93,7 @@ const UserOfferCard: React.FC<UserOfferCardProps> = ({ offer }) => {
                     <Text>
                       Expires:{" "}
                       {new Date(
-                        parseInt(offer.expiration_time) * 1000,
+                        Number(offer.expiration_time) * 1000,
                       ).toLocaleString()}
                     </Text>
                   </>

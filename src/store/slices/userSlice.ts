@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface UserState {
   selectedRarity: number | "all"
-  viewType: "nfts" | "auctions" | "offers"
+  viewType: "nfts" | "auctions" | "offers" | "listed"
 }
 
 const initialState: UserState = {

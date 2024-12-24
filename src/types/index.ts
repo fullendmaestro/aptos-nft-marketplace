@@ -16,6 +16,7 @@ export type NFT = {
   description: string
   uri: string
   rarity: number
+  for_sale?: boolean
   status?: NFTStatus
 }
 

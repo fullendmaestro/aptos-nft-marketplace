@@ -28,7 +28,7 @@ const AcceptOfferModal: React.FC<AcceptOfferModalProps> = ({
 
     setLoading(true)
     try {
-      await acceptOffer(account.address, nft.id, offer.buyer)
+      await acceptOffer(nft.id, offer.buyer)
       message.success("Offer accepted successfully")
       onSuccess()
     } catch (error) {

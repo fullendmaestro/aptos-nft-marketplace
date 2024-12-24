@@ -21,7 +21,7 @@ const OutgoingOffersList: React.FC<OutgoingOffersListProps> = ({
     if (!account) return
 
     try {
-      await cancelOffer(account, nftId)
+      await cancelOffer(nftId)
       onOfferCancelled()
     } catch (error) {
       console.error("Error cancelling offer:", error)
