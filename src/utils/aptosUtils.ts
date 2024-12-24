@@ -74,18 +74,18 @@ export const fetchNFTDetails = async (nft_id: string): Promise<NFT> => {
   const [id, owner, name, description, uri, rarity] = response
 
   return {
-    id,
-    owner,
-    name: hexToString(name),
-    description: hexToString(description),
-    uri: hexToString(uri),
-    rarity,
+    id: Number(id),
+    owner: owner.toString(),
+    name: hexToString(name.toString()),
+    description: hexToString(description.toString()),
+    uri: hexToString(uri.toString()),
+    rarity: Number(rarity),
   }
 }
 
 export const fetchAuctionDetails = async (
   nft_id: string,
-): Promise<Auction | null> => {
+): Promise<Auction | any> => {
   try {
     const response = await client.view({
       function: `${marketplaceAddr}::NFTMarketplace::get_auction_details`,
@@ -127,9 +127,9 @@ export const fetchOfferDetails = async (
     return {
       nft_id: parseInt(nft_id),
       buyer,
-      price,
-      expiration_time: expirationTime,
-      is_active: isActive,
+      price: Number(price),
+      expiration_time: Number(expirationTime),
+      is_active: Boolean(isActive),
     }
   } catch (error) {
     // Return null if no offer exists

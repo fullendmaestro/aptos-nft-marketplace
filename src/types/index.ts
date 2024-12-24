@@ -24,6 +24,7 @@ export type OwnedNFT = NFT & {
 }
 
 export type ListedNFT = NFT & {
+  nft_id: number
   price: number
   for_sale: boolean
 }
@@ -55,7 +56,7 @@ export type NFTWithDetails = NFT & {
 
 export type AuctionData = NFT & {
   status: NFTStatus
-  auction: Auction
+  auction: Auction | any
 }
 
 export type NFTData = NFT | AuctionData | OfferData | ListedNFT
