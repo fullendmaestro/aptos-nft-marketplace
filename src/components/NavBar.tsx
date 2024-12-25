@@ -68,12 +68,8 @@ const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
 
   return (
     <Header className="flex justify-between items-center bg-gray-800 px-6 h-16">
+      <img src="/Aptos_Primary_WHT.png" alt="Aptos Logo" className="h-8 mr-6" />
       <div className="flex items-center">
-        <img
-          src="/Aptos_Primary_WHT.png"
-          alt="Aptos Logo"
-          className="h-8 mr-6"
-        />
         <div className="flex items-center space-x-6">
           <Link
             to="/"
@@ -94,45 +90,45 @@ const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
             Mint NFT
           </button>
         </div>
+        <div className="w-5"></div>
+        <Space className="items-center">
+          {connected && account ? (
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item key="address">
+                    <Text strong>Address:</Text> <br />
+                    <Text copyable>{account.address}</Text>
+                  </Menu.Item>
+                  <Menu.Item key="network">
+                    <Text strong>Network:</Text>{" "}
+                    {network ? network.name : "Unknown"}
+                  </Menu.Item>
+                  <Menu.Item key="balance">
+                    <Text strong>Balance:</Text>{" "}
+                    {balance !== null ? `${balance} APT` : "Loading..."}
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Item
+                    key="logout"
+                    icon={<LogoutOutlined />}
+                    onClick={handleLogout}
+                  >
+                    Log Out
+                  </Menu.Item>
+                </Menu>
+              }
+              trigger={["click"]}
+            >
+              <Button type="primary">
+                Connected <DownOutlined />
+              </Button>
+            </Dropdown>
+          ) : (
+            <WalletSelector />
+          )}
+        </Space>
       </div>
-
-      <Space className="items-center">
-        {connected && account ? (
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item key="address">
-                  <Text strong>Address:</Text> <br />
-                  <Text copyable>{account.address}</Text>
-                </Menu.Item>
-                <Menu.Item key="network">
-                  <Text strong>Network:</Text>{" "}
-                  {network ? network.name : "Unknown"}
-                </Menu.Item>
-                <Menu.Item key="balance">
-                  <Text strong>Balance:</Text>{" "}
-                  {balance !== null ? `${balance} APT` : "Loading..."}
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item
-                  key="logout"
-                  icon={<LogoutOutlined />}
-                  onClick={handleLogout}
-                >
-                  Log Out
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={["click"]}
-          >
-            <Button type="primary">
-              Connected <DownOutlined />
-            </Button>
-          </Dropdown>
-        ) : (
-          <WalletSelector />
-        )}
-      </Space>
     </Header>
   )
 }
