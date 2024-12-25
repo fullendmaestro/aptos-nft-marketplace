@@ -4,10 +4,15 @@ import { Modal, Form, Input, Button, message } from "antd"
 import { AuctionData } from "../../types"
 import { placeBid } from "../../utils/aptosUtils"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import { useAppDispatch } from "../../store/hooks"
+import {
+  refreshMarketplaceAuctions,
+  refreshUserAuctions,
+} from "../../store/slices/auctionsSlice"
 
 interface PlaceBidModalProps {
   visible: boolean
-  auction: AuctionData | null
+  auction: AuctionData
   onCancel: () => void
   onBidPlaced: () => void
 }
@@ -21,8 +26,8 @@ const PlaceBidModal: React.FC<PlaceBidModalProps> = ({
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const { account } = useWallet()
+  const dispatch = useAppDispatch()
 
-  // Update the error handling in handleSubmit
   const handleSubmit = async (values: { bidAmount: number }) => {
     if (!auction || !account) {
       message.error("Missing auction details or wallet not connected")
@@ -34,6 +39,10 @@ const PlaceBidModal: React.FC<PlaceBidModalProps> = ({
       await placeBid(auction.id, values.bidAmount)
       message.success("Bid placed successfully!")
       onBidPlaced()
+      dispatch(refreshMarketplaceAuctions(undefined))
+      if (auction.owner === account.address) {
+        dispatch(refreshUserAuctions(account.address))
+      }
       onCancel()
     } catch (error: any) {
       console.error("Error placing bid:", error)

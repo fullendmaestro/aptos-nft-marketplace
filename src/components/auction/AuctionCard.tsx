@@ -33,7 +33,10 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
           <Button
             type="primary"
             onClick={showModal}
-            disabled={!auction.auction.is_active}
+            disabled={
+              !auction.auction.is_active ||
+              auction.auction.end_time * 1000 < Date.now()
+            }
           >
             Place Bid
           </Button>,
@@ -73,74 +76,3 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
 }
 
 export default AuctionCard
-
-// import React, { useState, useEffect } from "react"
-// import { Card, Statistic, Button, Modal } from "antd"
-// import { useWallet } from "@aptos-labs/wallet-adapter-react"
-// import { marketplaceAddr } from "@/constants"
-// import { AuctionData } from "@/types"
-
-// const { Meta } = Card
-// const { Countdown } = Statistic
-
-// interface AuctionCardProps {
-//   auction: AuctionData
-//   showEndAuction?: boolean
-//   onAuctionEnded?: () => void
-// }
-
-// const AuctionCard: React.FC<AuctionCardProps> = ({
-//   auction,
-//   showEndAuction = false,
-//   onAuctionEnded,
-// }) => {
-//   console.log("this is the auction", auction)
-//   const [isModalVisible, setIsModalVisible] = useState(false)
-//   const [timeLeft, setTimeLeft] = useState<number>(0)
-//   const [loading, setLoading] = useState(false)
-//   const { account } = useWallet()
-
-//   useEffect(() => {
-//     const endTime = parseInt(auction.auction.end_time.toString()) * 1000
-//     const now = Date.now()
-//     setTimeLeft(Math.max(0, endTime - now))
-
-//     const timer = setInterval(() => {
-//       const remaining = Math.max(0, endTime - Date.now())
-//       setTimeLeft(remaining)
-//       if (remaining === 0) {
-//         clearInterval(timer)
-//         if (onAuctionEnded) onAuctionEnded()
-//       }
-//     }, 1000)
-
-//     return () => clearInterval(timer)
-//   }, [auction.auction.end_time, onAuctionEnded])
-
-//   return (
-//     <Card
-//       cover={<img alt={auction.name} src={auction.uri} />}
-//       actions={[
-//         <Button type="primary" onClick={() => setIsModalVisible(true)}>
-//           Place Bid
-//         </Button>,
-//       ]}
-//     >
-//       <Meta title={auction.name} description={auction.description} />
-//       <p>Current Bid: {auction.auction.current_bid} ETH</p>
-//       <p>Start Price: {auction.auction.start_price} ETH</p>
-//       <p>Highest Bidder: {auction.auction.highest_bidder}</p>
-//       <Countdown title="Time Left" value={Date.now() + timeLeft} />
-//       <Modal
-//         title="Place a Bid"
-//         visible={isModalVisible}
-//         onCancel={() => setIsModalVisible(false)}
-//         footer={null}
-//       >
-//         {/* Modal content for placing a bid */}
-//       </Modal>
-//     </Card>
-//   )
-// }
-
-// export default AuctionCard

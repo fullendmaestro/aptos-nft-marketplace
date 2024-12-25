@@ -1,33 +1,52 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { OfferData } from "../../types"
-import { fetchOffers, fetchIncomingOffers } from "../../utils/aptosUtils"
+import { NFT, OfferData } from "../../types"
+import {
+  fetchIncomingOffers,
+  fetchOutgoingOffers,
+} from "../../utils/aptosUtils"
 
 interface OffersState {
-  marketplaceOffers: OfferData[]
   incomingOffers: OfferData[]
+  outgoingOffers: NFT[]
   loading: boolean
   error: string | null
 }
 
 const initialState: OffersState = {
-  marketplaceOffers: [],
   incomingOffers: [],
+  outgoingOffers: [],
   loading: false,
   error: null,
 }
-
-export const fetchMarketplaceOffers = createAsyncThunk(
-  "offers/fetchMarketplaceOffers",
-  async (rarity: number | undefined) => {
-    const offers = await fetchOffers(rarity)
-    return offers
-  },
-)
 
 export const fetchUserIncomingOffers = createAsyncThunk(
   "offers/fetchUserIncomingOffers",
   async (userAddress: string) => {
     const offers = await fetchIncomingOffers(userAddress)
+    return offers
+  },
+)
+
+export const fetchUserOutgoingOffers = createAsyncThunk(
+  "offers/fetchUserOutgoingOffers",
+  async (userAddress: string) => {
+    const offers = await fetchOutgoingOffers(userAddress)
+    return offers
+  },
+)
+
+export const refreshUserIncomingOffers = createAsyncThunk(
+  "offers/refreshUserIncomingOffers",
+  async (userAddress: string) => {
+    const offers = await fetchIncomingOffers(userAddress)
+    return offers
+  },
+)
+
+export const refreshUserOutgoingOffers = createAsyncThunk(
+  "offers/refreshUserOutgoingOffers",
+  async (userAddress: string) => {
+    const offers = await fetchOutgoingOffers(userAddress)
     return offers
   },
 )
@@ -38,18 +57,6 @@ const offersSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      .addCase(fetchMarketplaceOffers.pending, state => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(fetchMarketplaceOffers.fulfilled, (state, action) => {
-        state.loading = false
-        state.marketplaceOffers = action.payload
-      })
-      .addCase(fetchMarketplaceOffers.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.error.message || "Failed to fetch offers"
-      })
       .addCase(fetchUserIncomingOffers.pending, state => {
         state.loading = true
         state.error = null
@@ -61,6 +68,18 @@ const offersSlice = createSlice({
       .addCase(fetchUserIncomingOffers.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Failed to fetch incoming offers"
+      })
+      .addCase(fetchUserOutgoingOffers.pending, state => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchUserOutgoingOffers.fulfilled, (state, action) => {
+        state.loading = false
+        state.outgoingOffers = action.payload
+      })
+      .addCase(fetchUserOutgoingOffers.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || "Failed to fetch outgoing offers"
       })
   },
 })

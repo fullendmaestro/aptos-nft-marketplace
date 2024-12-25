@@ -32,6 +32,22 @@ export const fetchUserAuctionsList = createAsyncThunk(
   },
 )
 
+export const refreshMarketplaceAuctions = createAsyncThunk(
+  "auctions/refreshMarketplaceAuctions",
+  async (rarity: number | undefined) => {
+    const auctions = await fetchAuctions(rarity)
+    return auctions
+  },
+)
+
+export const refreshUserAuctions = createAsyncThunk(
+  "auctions/refreshUserAuctions",
+  async (userAddress: string) => {
+    const auctions = await fetchUserAuctions(userAddress)
+    return auctions
+  },
+)
+
 const auctionsSlice = createSlice({
   name: "auctions",
   initialState,
@@ -61,6 +77,12 @@ const auctionsSlice = createSlice({
       .addCase(fetchUserAuctionsList.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message || "Failed to fetch user auctions"
+      })
+      .addCase(refreshMarketplaceAuctions.fulfilled, (state, action) => {
+        state.marketplaceAuctions = action.payload
+      })
+      .addCase(refreshUserAuctions.fulfilled, (state, action) => {
+        state.userAuctions = action.payload
       })
   },
 })

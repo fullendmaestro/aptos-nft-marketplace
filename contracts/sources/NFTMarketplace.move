@@ -1,4 +1,3 @@
-// contracts\sources\NFTMarketplace.move
 address 0x388ed434f0223624dba110cd117d7b99ce6ab55fe975bbd04c0b4f02184bde3f {
     module NFTMarketplace {
         use 0x1::signer;
@@ -595,8 +594,8 @@ address 0x388ed434f0223624dba110cd117d7b99ce6ab55fe975bbd04c0b4f02184bde3f {
                 let listed_len = vector::length(&marketplace.listed_nfts);
                 let mut_j = 0;
                 while (mut_j < listed_len) {
-                    let listed = vector::borrow(&marketplace.listed_nfts, mut_j);
-                    if (listed.nft_id == nft_id) {
+                    let listed_nft = vector::borrow(&marketplace.listed_nfts, mut_j);
+                    if (listed_nft.nft_id == nft_id) {
                         is_listed = true;
                         break
                     };
@@ -667,10 +666,81 @@ address 0x388ed434f0223624dba110cd117d7b99ce6ab55fe975bbd04c0b4f02184bde3f {
             offer_nfts
         }
 
+        #[view]
+        public fun get_outgoing_offers(marketplace_addr: address, user_addr: address): vector<u64> acquires Marketplace {
+            let marketplace = borrow_global<Marketplace>(marketplace_addr);
+            let offer_nfts = vector::empty<u64>();
+            
+            let offers_len = vector::length(&marketplace.offers);
+            let mut_i = 0;
+            
+            while (mut_i < offers_len) {
+                let offer = vector::borrow(&marketplace.offers, mut_i);
+                if (offer.buyer == user_addr && offer.is_active) {
+                    vector::push_back(&mut offer_nfts, offer.nft_id);
+                };
+                mut_i = mut_i + 1;
+            };
+            
+            offer_nfts
+        }
+
+        #[view]
+        public fun get_user_available_nfts(marketplace_addr: address, user_addr: address): vector<u64> acquires Marketplace {
+            let marketplace = borrow_global<Marketplace>(marketplace_addr);
+            let available_nfts = vector::empty<u64>();
+
+            let nfts_len = vector::length(&marketplace.nfts);
+            let mut_i = 0;
+
+            while (mut_i < nfts_len) {
+                let nft = vector::borrow(&marketplace.nfts, mut_i);
+                let nft_id = nft.id;
+
+                // Check if NFT is owned by the user and not listed for sale or auction
+                if (nft.owner == user_addr) {
+                    let is_listed = false;
+                    let listed_len = vector::length(&marketplace.listed_nfts);
+                    let mut_j = 0;
+                while (mut_j < listed_len) {
+                    let listed_nft = vector::borrow(&marketplace.listed_nfts, mut_j);
+                    if (listed_nft.nft_id == nft_id) {
+                        is_listed = true;
+                        break
+                    };
+                    mut_j = mut_j + 1;
+                };
+
+                    if (!is_listed) {
+                        vector::push_back(&mut available_nfts, nft_id);
+                    }
+                };
+                mut_i = mut_i + 1;
+            };
+
+            available_nfts
+        }
+
+        #[view]
+        public fun get_listed_nfts(marketplace_addr: address): vector<u64> acquires Marketplace {
+            let marketplace = borrow_global<Marketplace>(marketplace_addr);
+            let listed_nfts = vector::empty<u64>();
+
+            let listed_len = vector::length(&marketplace.listed_nfts);
+            let mut_i = 0;
+
+            while (mut_i < listed_len) {
+                let listed_nft = vector::borrow(&marketplace.listed_nfts, mut_i);
+                vector::push_back(&mut listed_nfts, listed_nft.nft_id);
+                mut_i = mut_i + 1;
+            };
+
+            listed_nfts
+        }
+
         // Helper functions
         fun min(a: u64, b: u64): u64 {
             if (a < b) { a } else { b }
         }
     }
 }
-

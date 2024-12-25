@@ -2,12 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface UserState {
   selectedRarity: number | "all"
-  viewType: "nfts" | "auctions" | "offers" | "listed"
+  viewType: "available" | "auctions" | "offers" | "listed"
 }
 
 const initialState: UserState = {
   selectedRarity: "all",
-  viewType: "nfts",
+  viewType: "available",
 }
 
 const userSlice = createSlice({
@@ -19,7 +19,7 @@ const userSlice = createSlice({
     },
     setViewType: (
       state,
-      action: PayloadAction<"nfts" | "auctions" | "offers">,
+      action: PayloadAction<"available" | "listed" | "auctions">,
     ) => {
       state.viewType = action.payload
     },

@@ -1,10 +1,12 @@
-// src\components\auction\EndAuctionModal.tsx
 import React, { useState } from "react"
-import { Modal, Form, Input, Button, message } from "antd"
+import { Modal, Button, message } from "antd"
 import { AuctionData } from "../../types"
-import { endAuction, placeBid } from "../../utils/aptosUtils"
+import { endAuction } from "../../utils/aptosUtils"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { truncateAddress } from "@/lib/utils"
+import { useAppDispatch } from "../../store/hooks"
+import { refreshUserAuctions } from "../../store/slices/auctionsSlice"
+import { refreshUserNFTsList } from "../../store/slices/nftsSlice"
 
 interface EndAuctionModalProps {
   visible: boolean
@@ -19,11 +21,10 @@ const EndAuctionModal: React.FC<EndAuctionModalProps> = ({
   onCancel,
   onAuctionEnded,
 }) => {
-  const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const { account } = useWallet()
+  const dispatch = useAppDispatch()
 
-  // Update the error handling in handleSubmit
   const handleEndAuction = async () => {
     if (!auction || !account) {
       message.error("Missing auction details or wallet not connected")
@@ -33,26 +34,17 @@ const EndAuctionModal: React.FC<EndAuctionModalProps> = ({
     setLoading(true)
     try {
       await endAuction(auction.id)
-      message.success("Bid ended successfully!")
+      message.success("Auction ended successfully!")
+      dispatch(refreshUserAuctions(account.address))
+      dispatch(refreshUserNFTsList(account.address))
       onAuctionEnded()
       onCancel()
     } catch (error: any) {
       console.error("Error Ending Auction:", error)
-      message.error("Faled to End Auction")
+      message.error("Failed to End Auction")
     } finally {
       setLoading(false)
     }
-  }
-
-  const validateBidAmount = (_: any, value: number) => {
-    if (!auction) return Promise.reject("No auction data available")
-    if (!value) return Promise.reject("Please enter a bid amount")
-    if (value <= auction.auction.current_bid) {
-      return Promise.reject(
-        `Bid must be higher than current bid (${auction.auction.current_bid} APT)`,
-      )
-    }
-    return Promise.resolve()
   }
 
   return (

@@ -103,7 +103,7 @@ const NavBar: React.FC<NavBarProps> = ({ onMintNFTClick }) => {
               <Menu>
                 <Menu.Item key="address">
                   <Text strong>Address:</Text> <br />
-                  <Text copyable>{truncateAddress(account.address)}</Text>
+                  <Text copyable>{account.address}</Text>
                 </Menu.Item>
                 <Menu.Item key="network">
                   <Text strong>Network:</Text>{" "}

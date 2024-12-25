@@ -5,9 +5,10 @@ import NFTCard from "./NFTCard"
 import Pagination from "../common/Pagination"
 import ListedNFTCard from "./ListedNFTCard"
 import AuctionCard from "../auction/AuctionCard"
-import UserNFTCard from "./userNFTCard"
+import UserNFTCard from "./UserNFTCard"
 import UserAuctionCard from "../auction/UserAuctionCard"
 import UserOfferCard from "../offer/UserOfferCard"
+import UserOutgoingOfferCard from "../offer/UserOutgoingOfferCard"
 
 interface NFTListProps {
   nfts: NFTDataList
@@ -41,6 +42,8 @@ const NFTList: React.FC<NFTListProps> = ({ nfts, tabType }) => {
         return <UserAuctionCard auction={nft} />
       case "offers":
         return <UserOfferCard offer={nft} />
+      case "o-offers":
+        return <UserOutgoingOfferCard nft={nft} />
       default:
         return <NFTCard nft={nft} />
     }

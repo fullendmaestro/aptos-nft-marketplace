@@ -25,7 +25,7 @@ export type OwnedNFT = NFT & {
 }
 
 export type ListedNFT = NFT & {
-  nft_id: number
+  nft_id?: number
   price: number
   for_sale: boolean
 }
@@ -46,6 +46,10 @@ export type Offer = {
   price: number
   expiration_time: number
   is_active: boolean
+}
+
+export type OutgoinOffer = NFT & {
+  offer: Offer
 }
 
 export type NFTWithDetails = NFT & {

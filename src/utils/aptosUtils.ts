@@ -158,49 +158,49 @@ export const fetchAvailableNFTs = async (): Promise<NFTWithDetails[]> => {
   return nfts
 }
 
+export const fetchListedNFTs = async (): Promise<ListedNFT[]> => {
+  try {
+    const response = await client.view({
+      function: `${marketplaceAddr}::NFTMarketplace::get_listed_nfts`,
+      type_arguments: [],
+      arguments: [marketplaceAddr],
+    })
+    const nftIds = response[0] as string[]
+    const listedNFTs = await Promise.all(
+      nftIds.map(async id => {
+        const nft = await fetchNFTDetails(id)
+        const price = await getNFTPrice(id)
+        return {
+          ...nft,
+          price,
+          for_sale: true,
+        }
+      }),
+    )
+    return listedNFTs
+  } catch (error) {
+    console.error("Error fetching listed NFTs:", error)
+    throw error
+  }
+}
+
 export const fetchUserNFTs = async (userAddress: string): Promise<NFT[]> => {
   try {
-    const marketplace = await client.getAccountResource(
-      marketplaceAddr,
-      `${marketplaceAddr}::NFTMarketplace::Marketplace`,
+    const response = await client.view({
+      function: `${marketplaceAddr}::NFTMarketplace::get_user_available_nfts`,
+      type_arguments: [],
+      arguments: [marketplaceAddr, userAddress],
+    })
+
+    const nftIds = response[0] as string[]
+    const nfts = await Promise.all(
+      nftIds.map(async id => {
+        const nft = await fetchNFTDetails(id)
+        return nft
+      }),
     )
 
-    const allNFTs = (marketplace.data as any).nfts
-    const userNFTs = allNFTs.filter((nft: any) => nft.owner === userAddress)
-
-    const decodedNFTs = await Promise.all(
-      userNFTs.map(async (nft: any) => ({
-        id: nft.id,
-        owner: nft.owner,
-        name: hexToString(nft.name),
-        description: hexToString(nft.description),
-        uri: hexToString(nft.uri),
-        rarity: nft.rarity,
-      })),
-    )
-
-    const auctionNFTs = await fetchUserAuctionNFTs(userAddress)
-
-    // Fetch NFTs with offers
-    const offerNFTs = await fetchIncomingOffers(userAddress)
-
-    // Get NFTs that are not in auction or have offers
-    const auctionIds = new Set(auctionNFTs.map(nft => nft.id))
-    const offerIds = new Set(offerNFTs.map(nft => nft.id))
-
-    const availableNFTs = await Promise.all(
-      decodedNFTs
-        .filter((nft: any) => !auctionIds.has(nft.id) && !offerIds.has(nft.id))
-        .map(async (nft: any) => {
-          const details = await fetchNFTDetails(nft.id.toString())
-          return {
-            ...details,
-            status: "available" as const,
-          }
-        }),
-    )
-
-    return availableNFTs
+    return nfts
   } catch (error) {
     console.error("Error fetching user NFTs:", error)
     throw error
@@ -262,7 +262,11 @@ export const fetchUserAuctions = async (
         return {
           ...nft,
           status: "in_auction" as const,
-          auction: auction!,
+          auction: {
+            ...auction,
+            current_bid: auction.current_bid / 100000000,
+            start_price: auction.start_price / 100000000,
+          },
         }
       }),
     )
@@ -553,4 +557,32 @@ export const getNFTPrice = async (nftId: string): Promise<number> => {
     console.error("Error getting NFT price:", error)
     return 0
   }
+}
+
+export const fetchOutgoingOffers = async (
+  userAddress: string,
+): Promise<NFT[]> => {
+  const response = await client.view({
+    function: `${marketplaceAddr}::NFTMarketplace::get_outgoing_offers`,
+    arguments: [marketplaceAddr, userAddress],
+    type_arguments: [],
+  })
+
+  console.log("returned outgoing offers >>>>", response)
+
+  const nftIds = response[0] as string[]
+  const nfts = await Promise.all(
+    nftIds.map(async id => {
+      const nft = await fetchNFTDetails(id)
+      const offerDetail = await fetchOfferDetails(id, userAddress)
+      return {
+        ...nft,
+        offer: {
+          ...offerDetail,
+        },
+      }
+    }),
+  )
+
+  return nfts
 }

@@ -1,10 +1,12 @@
-// src\components\offer\AcceptOfferModal.tsx
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Modal, List, Button, message } from "antd"
 import { NFTWithDetails, Offer } from "../../types"
 import { acceptOffer } from "../../utils/aptosUtils"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { truncateAddress } from "@/lib/utils"
+import { useAppDispatch } from "../../store/hooks"
+import { refreshUserNFTsList } from "../../store/slices/nftsSlice"
+import { refreshUserIncomingOffers } from "../../store/slices/offersSlice"
 
 interface AcceptOfferModalProps {
   visible: boolean
@@ -21,6 +23,7 @@ const AcceptOfferModal: React.FC<AcceptOfferModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false)
   const { account } = useWallet()
+  const dispatch = useAppDispatch()
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
 
   const handleAcceptOffer = async (offer: Offer) => {
@@ -30,6 +33,8 @@ const AcceptOfferModal: React.FC<AcceptOfferModalProps> = ({
     try {
       await acceptOffer(nft.id, offer.buyer)
       message.success("Offer accepted successfully")
+      dispatch(refreshUserNFTsList(account.address))
+      dispatch(refreshUserIncomingOffers(account.address))
       onSuccess()
     } catch (error) {
       console.error("Error accepting offer:", error)
@@ -63,7 +68,7 @@ const AcceptOfferModal: React.FC<AcceptOfferModalProps> = ({
               ]}
             >
               <List.Item.Meta
-                title={`${offer.price} APT`}
+                title={`${offer.price / 100000000} APT`}
                 description={
                   <>
                     <p>From: {truncateAddress(offer.buyer)}</p>
