@@ -17,4 +17,4 @@ export const rarityLabels: { [key: number]: string } = {
 }
 export const moduleName = "NFTMarketplaceV2"
 
-export const tesnetaddr = "https://fullnode.devnet.aptoslabs.com/v1"
+export const tesnetaddr = "https://fullnode.testnet.aptoslabs.com/v1"
