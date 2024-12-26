@@ -14,7 +14,6 @@ interface UserAuctionCardProps {
 }
 
 const UserAuctionCard: React.FC<UserAuctionCardProps> = ({ auction }) => {
-  console.log("auctionn argv psd", auction)
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const showModal = () => setIsModalVisible(true)

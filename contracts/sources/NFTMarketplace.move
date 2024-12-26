@@ -1,5 +1,5 @@
-address 0x388ed434f0223624dba110cd117d7b99ce6ab55fe975bbd04c0b4f02184bde3f {
-    module NFTMarketplace {
+address 0xb7766d073ff1b077aa8fda2859e151a621a4b8f2049685b83ab70b8b948aedba {
+    module NFTMarketplaceV2 {
         use 0x1::signer;
         use 0x1::vector;
         use 0x1::coin;

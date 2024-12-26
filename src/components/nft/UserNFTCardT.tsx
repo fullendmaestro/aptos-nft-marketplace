@@ -13,7 +13,7 @@ import {
 } from "antd"
 import { NFT, OwnedNFT } from "../../types"
 import { truncateAddress } from "../../lib/utils"
-import { rarityColors, rarityLabels } from "@/constants"
+import { moduleName, rarityColors, rarityLabels } from "@/constants"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { client } from "@/utils/aptosUtils"
 import { marketplaceAddr } from "@/constants"
@@ -60,7 +60,7 @@ const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
         case "sell":
           payload = {
             type: "entry_function_payload",
-            function: `${marketplaceAddr}::NFTMarketplace::list_for_sale`,
+            function: `${marketplaceAddr}::${moduleName}::list_for_sale`,
             type_arguments: [],
             arguments: [
               marketplaceAddr,
@@ -72,7 +72,7 @@ const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
         case "auction":
           payload = {
             type: "entry_function_payload",
-            function: `${marketplaceAddr}::NFTMarketplace::create_auction`,
+            function: `${marketplaceAddr}::${moduleName}::create_auction`,
             type_arguments: [],
             arguments: [
               marketplaceAddr,
@@ -85,7 +85,7 @@ const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
         case "transfer":
           payload = {
             type: "entry_function_payload",
-            function: `${marketplaceAddr}::NFTMarketplace::transfer_ownership`,
+            function: `${marketplaceAddr}::${moduleName}::transfer_ownership`,
             type_arguments: [],
             arguments: [marketplaceAddr, nft.id.toString(), values.recipient],
           }

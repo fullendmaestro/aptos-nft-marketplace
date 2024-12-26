@@ -6,7 +6,7 @@ import { Layout, Modal, Form, Input, Select, Button, message } from "antd"
 import NavBar from "./components/NavBar"
 import MarketView from "./pages/MarketView"
 import MyNFTs from "./pages/MyNFTs"
-import { marketplaceAddr } from "./constants"
+import { marketplaceAddr, moduleName } from "./constants"
 import { client } from "./utils/aptosUtils"
 import Home from "./pages/Home"
 import { useAppDispatch } from "./store/hooks"
@@ -39,7 +39,7 @@ function App() {
 
       const entryFunctionPayload = {
         type: "entry_function_payload",
-        function: `${marketplaceAddr}::NFTMarketplace::mint_nft`,
+        function: `${marketplaceAddr}::${moduleName}::mint_nft`,
         type_arguments: [],
         arguments: [
           marketplaceAddr,
