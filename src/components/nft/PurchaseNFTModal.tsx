@@ -37,11 +37,11 @@ const PurchaseNFTModal: React.FC<PurchaseModalProps> = ({
       await purchaseNFT(nft)
       message.success("NFT purchased successfully!")
       dispatch(refreshAvailableNFTsList())
-      dispatch(refreshUserNFTsList(account.address))
       onSuccess()
     } catch (error) {
       console.error("Error purchasing NFT:", error)
       message.error("Failed to purchase NFT")
+      dispatch(refreshAvailableNFTsList())
     }
   }
 

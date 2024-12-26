@@ -17,6 +17,8 @@ import { rarityColors, rarityLabels } from "@/constants"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { client } from "@/utils/aptosUtils"
 import { marketplaceAddr } from "@/constants"
+import { useAppDispatch } from "@/store/hooks"
+import { refreshUserNFTsList } from "@/store/slices/nftsSlice"
 
 const { Title } = Typography
 const { Meta } = Card
@@ -29,7 +31,7 @@ interface UserNFTCardProps {
 type selectedAction = "sell" | "auction" | "transfer" | "offer"
 
 const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
-  console.log("user nft card arg nft", nft)
+  const dispatch = useAppDispatch()
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [selectedAction, setSelectedAction] = useState<selectedAction>("sell")
   const [loading, setLoading] = useState(false)
@@ -98,9 +100,11 @@ const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
       message.success(`NFT ${selectedAction} successful!`)
       setIsModalVisible(false)
       form.resetFields()
+      dispatch(refreshUserNFTsList(account.address))
     } catch (error) {
       console.error(`Error ${selectedAction}ing NFT:`, error)
       message.error(`Failed to ${selectedAction} NFT`)
+      dispatch(refreshUserNFTsList(account.address))
     } finally {
       setLoading(false)
     }

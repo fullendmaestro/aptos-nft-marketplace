@@ -26,15 +26,7 @@ const ListedNFTCard: React.FC<ListedNFTCardProps> = ({ listing }) => {
   }
 
   const handleConfirmPurchase = async () => {
-    try {
-      await purchaseNFT(listing)
-
-      message.success("NFT purchased successfully!")
-      setIsBuyModalVisible(false)
-    } catch (error) {
-      console.error("Error purchasing NFT:", error)
-      message.error("Failed to purchase NFT.")
-    }
+    setIsBuyModalVisible(false)
   }
 
   return (
