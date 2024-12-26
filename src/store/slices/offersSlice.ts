@@ -81,6 +81,12 @@ const offersSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Failed to fetch outgoing offers"
       })
+      .addCase(refreshUserIncomingOffers.fulfilled, (state, action) => {
+        state.incomingOffers = action.payload
+      })
+      .addCase(refreshUserOutgoingOffers.fulfilled, (state, action) => {
+        state.outgoingOffers = action.payload
+      })
   },
 })
 

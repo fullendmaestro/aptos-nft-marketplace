@@ -9,9 +9,18 @@ import MyNFTs from "./pages/MyNFTs"
 import { marketplaceAddr } from "./constants"
 import { client } from "./utils/aptosUtils"
 import Home from "./pages/Home"
+import { useAppDispatch } from "./store/hooks"
+import {
+  refreshListedNFTsList,
+  refreshUserNFTsList,
+} from "./store/slices/nftsSlice"
+import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
 function App() {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const dispatch = useAppDispatch()
+
+  const { connected, account } = useWallet()
 
   const handleMintNFTClick = () => setIsModalVisible(true)
 
@@ -45,7 +54,10 @@ function App() {
         entryFunctionPayload,
       )
       await client.waitForTransaction(txnResponse.hash)
-
+      dispatch(refreshListedNFTsList())
+      if (account) {
+        dispatch(refreshUserNFTsList(account.address))
+      }
       message.success("NFT minted successfully!")
       setIsModalVisible(false)
     } catch (error) {

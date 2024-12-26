@@ -112,6 +112,15 @@ const nftsSlice = createSlice({
         state.loading = false
         state.error = action.error.message || "Failed to fetch user NFTs"
       })
+      .addCase(refreshAvailableNFTsList.fulfilled, (state, action) => {
+        state.availableNFTs = action.payload
+      })
+      .addCase(refreshListedNFTsList.fulfilled, (state, action) => {
+        state.listedNFTs = action.payload
+      })
+      .addCase(refreshUserNFTsList.fulfilled, (state, action) => {
+        state.userNFTs = action.payload
+      })
   },
 })
 

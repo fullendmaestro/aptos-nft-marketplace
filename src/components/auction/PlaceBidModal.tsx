@@ -46,7 +46,7 @@ const PlaceBidModal: React.FC<PlaceBidModalProps> = ({
       onCancel()
     } catch (error: any) {
       console.error("Error placing bid:", error)
-      message.error(error.message)
+      message.error("Error placing bid")
     } finally {
       setLoading(false)
     }
