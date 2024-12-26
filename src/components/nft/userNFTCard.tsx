@@ -224,7 +224,7 @@ const UserNFTCard: React.FC<UserNFTCardProps> = ({ nft }) => {
 
             <Form.Item>
               <Button type="primary" htmlType="submit">
-                Confirm{" "}
+                Confirm
                 {selectedAction.charAt(0).toUpperCase() +
                   selectedAction.slice(1)}
               </Button>
